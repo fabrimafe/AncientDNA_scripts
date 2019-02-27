@@ -1,4 +1,6 @@
-#==============================functions put all demographies together===========================
+#==============================function to put all demographies together===========================
+
+#convert a hist file (from psmc) into snippet of ms demography to combine it in multiple individuals demographies
 
 #------------------------EXAMPLE---------------
 # #Easiest strategy is to bring all hist to rescaled hist. This is not exactly what I do for simulations, where I actually do rescale ms theta. But ms theta and ms psmc are linear, so it is all good.
@@ -33,55 +35,6 @@
 #-----------------------------------------------
 
 #add branch shortening (already rescaled in units of 4Ne). Corrected to feed time in number of generations
-hist2rescaledms () {
-awk -v L=$1 -v mu=$2 -v ipop=$3 -v N0ref=$4 -v bs=$5 '{
-if ($1=="T"){thetapsmc=$2};
-if ($1=="H"){
-    if ($2==0){lambda0psmc=$3; 
-    thetams=thetapsmc*lambda0psmc*L/100;
-    N0psmc=thetapsmc/(4*100*mu);
-    N0ms=thetams/(4*mu)/L;
-    lambdarescaling=N0ms/N0ref;
-    print thetams,N0ms,thetapsmc,N0psmc,lambda0psmc,lambdarescaling; 
-    printf "-n %d %f ",ipop,lambdarescaling
-    } else
-{ printf "-en %f %d %f ",bs/(4*N0ref)+$2*lambdarescaling*N0psmc/N0ms/2,ipop,$3*lambdarescaling/lambda0psmc} 
-}
-}'
-}
-
-#lambda0psmc is time at N0 for psmc
-hist2msN0ref () {
-awk -v L=$1 -v mu=$2 -v ipop=$3 -v N0ref=$4 -v bs=$5 '{
-if ($1=="T"){thetapsmc=$2};
-if ($1=="H"){
-    if ($2==0){
-    lambda0psmc=$3; 
-    thetams=N0ref*4*mu*L;
-    N0=thetapsmc*lambda0psmc/(4*100*mu);
-    print thetams,N0; 
-    printf "-n %d %f ",ipop,N0/N0ref
-    } else
-{ printf "-en %f %d %f ",$2*N0ref/N0/2,ipop,$3*N0/N0ref} 
-}
-}'
-}
-#note that as in instructions of psmc lambda0 is the one in T field (hist file) or TR in psmc file. So what pop at time 0 to 1st time is actually t1 (lambda1psmc)
-hist2msN0ref () {
-awk -v L=$1 -v mu=$2 -v ipop=$3 -v N0ref=$4 -v bs=$5 '{
-if ($1=="T"){thetapsmc=$2};
-if ($1=="H")
-    {
-    if ($2==0){
-    lambda1psmc=$3;
-    thetams=N0ref*4*mu*L;
-    N0psmc=thetapsmc/(4*100*mu);
-    N0=N0psmc*lambda1psmc;
-    print thetams,N0psmc,N0; 
-    printf "-n %d %f ",ipop,N0/N0ref;} else { printf "-en %f %d %f ",bs/(4*N0ref)+$2*(N0psmc/N0ref)/2,ipop,$3*(N0psmc/N0ref); }};
-}'
-}
-
 #add also a final time, so that I truncate if beyond a given time in the past
 hist2msN0ref () {
 awk -v L=$1 -v mu=$2 -v ipop=$3 -v N0ref=$4 -v bs=$5 -v max_time=$6 -v print_n=$7 '{
@@ -100,4 +53,4 @@ if ($1=="H")
 }'
 }
 
-export hist2msN0ref
+hist2msN0ref $1 $2 $3 $4 $5 $6 $7
