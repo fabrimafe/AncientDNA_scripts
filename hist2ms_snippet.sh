@@ -37,7 +37,7 @@
 #add branch shortening (already rescaled in units of 4Ne). Corrected to feed time in number of generations
 #add also a final time, so that I truncate if beyond a given time in the past
 hist2msN0ref () {
-awk -v L=$1 -v mu=$2 -v ipop=$3 -v N0ref=$4 -v bs=$5 -v max_time=$6 -v print_n=$7 '{
+awk -v L=$1 -v mu=$2 -v ipop=$3 -v N0ref=$4 -v bs=$5 -v min_time=$6 -v max_time=$7 -v print_n=$8 '{
 if ($1=="T"){thetapsmc=$2};
 if ($1=="H")
     {
@@ -47,10 +47,10 @@ if ($1=="H")
     N0psmc=thetapsmc/(4*100*mu);
     N0=N0psmc*lambda1psmc;
     print thetams,N0psmc,N0; 
-    if (print_n == 1) {printf "-n %d %f ",ipop,N0/N0ref;}
-    } else if ( (max_time/(4*N0ref))>( $2*(N0psmc/N0ref)/2) )
+    if (print_n == 1) {printf "-n %d %f ",ipop,N0/N0ref}} else
+    if (( (max_time/(4*N0ref))>( $2*(N0psmc/N0ref)/2) ) && ( (min_time/(4*N0ref))<( $2*(N0psmc/N0ref)/2) ))
     { printf "-en %f %d %f ",bs/(4*N0ref)+$2*(N0psmc/N0ref)/2,ipop,$3*(N0psmc/N0ref); }};
-}'
+}END{ printf " \\ \n"}'
 }
 
-hist2msN0ref $1 $2 $3 $4 $5 $6 $7
+hist2msN0ref $1 $2 $3 $4 $5 $6 $7 $8
