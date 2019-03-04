@@ -50,7 +50,7 @@ if ($1=="H")
     if (print_n == 1) {printf "-n %d %f ",ipop,N0/N0ref}} else
     if (( (max_time/(4*N0ref))>( $2*(N0psmc/N0ref)/2) ) && ( (min_time/(4*N0ref))<( $2*(N0psmc/N0ref)/2) ))
     { printf "-en %f %d %f ",bs/(4*N0ref)+$2*(N0psmc/N0ref)/2,ipop,$3*(N0psmc/N0ref); }};
-}END{ printf " \\ \n"}'
+}END{ printf " \\\n"}'
 }
 
 hist2msN0ref $1 $2 $3 $4 $5 $6 $7 $8
