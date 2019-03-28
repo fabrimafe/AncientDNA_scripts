@@ -89,6 +89,8 @@ myfile=sims_Vindija33.19.sh
 myfile=sims_onlyVindija33.19_d.sh
 myfile=sims_V+Af.sh
 
+
+myfile=scrm10.sh
 cat $myfile | grep -v '#' | sed 's/-/\n/g' | sort | grep ^I | sed 's/\\//g' > temp.tab
 cat $myfile | grep -v '#' | sed 's/-/\n/g' | sort | grep ^t | sed 's/\\//g' >> temp.tab
 cat $myfile | grep -v '#' | sed 's/-/\n/g' | sort | grep ^r | sed 's/\\//g' >> temp.tab
