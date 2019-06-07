@@ -63,21 +63,22 @@ fst_reich_i <- function(x0,x1,x2,y0,y1,y2) {
  hatD<-hatN+h1+h2
  sum(hatN)/sum(hatD)
 } 
-calculate.pairwise.Fst.normalized<-function (allele.counts, sample.sizes) 
+
+calculate.pairwise.Fst.normalized<-function (allele.counts, sample.sizes)
 {
 #fst from Weir & Cockerham 1984 modified to have frequencies between 0.001 and 0.999
     raw.population.allele.frequencies <- allele.counts/sample.sizes*0.998+0.001
-    missing.data.loci <- which(is.na(raw.population.allele.frequencies), 
+    missing.data.loci <- which(is.na(raw.population.allele.frequencies),
         arr.ind = TRUE)[, 2]
     if (sum(missing.data.loci) > 0) {
         allele.counts <- allele.counts[, -c(missing.data.loci)]
         sample.sizes <- sample.sizes[, -c(missing.data.loci)]
     }
-    population.allele.frequencies <- allele.counts/sample.sizes
-    mean.allele.frequencies <- colSums(allele.counts)/colSums(sample.sizes)
-    MSP <- colSums(sample.sizes * t(apply(population.allele.frequencies, 
+    population.allele.frequencies <- allele.counts/sample.sizes*0.998+0.001
+    mean.allele.frequencies <- colSums(allele.counts)/colSums(sample.sizes)*0.998+0.001
+    MSP <- colSums(sample.sizes * t(apply(population.allele.frequencies,
         1, "-", mean.allele.frequencies)^2))
-    MSG <- (1/(colSums(sample.sizes - 1))) * colSums(sample.sizes * 
+    MSG <- (1/(colSums(sample.sizes - 1))) * colSums(sample.sizes *
         population.allele.frequencies * (1 - population.allele.frequencies))
     n.c <- colSums(sample.sizes) - colSums(sample.sizes^2)/colSums(sample.sizes)
     theta <- sum(MSP - MSG)/sum(MSP + (n.c - 1) * MSG)

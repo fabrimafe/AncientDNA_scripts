@@ -88,6 +88,17 @@ pop1<-c("Denisova")
 pop2<-c("AltaiNeandertal","Chagyrskaya-Phalanx","Vindija33.19")
 print(paste("init scan",pop1[1],pop2[1]))
 
+
+mydata1<-t(apply(mydata0[,pop1,with=FALSE],MARGIN=1,FUN=function(x) c(sum(x=="0/0"),sum(x=="0/1" | x=="1/0"),sum(x=="1/1"))))
+mydata2<-t(apply(mydata0[,pop2,with=FALSE],MARGIN=1,FUN=function(x) c(sum(x=="0/0"),sum(x=="0/1" | x=="1/0"),sum(x=="1/1"))))
+mydata1_allelefreq_normalized<-apply(mydata1, MARGIN=1,function(x) 0.001+(x[2]+2*x[3])/(2*sum(x))*0.998)
+mydata2_allelefreq_normalized<-apply(mydata2, MARGIN=1,function(x) 0.001+(x[2]+2*x[3])/(2*sum(x))*0.998)
+mydata1_n<-apply(mydata1, MARGIN=1,function(x) 2*sum(x))
+mydata2_n<-apply(mydata2, MARGIN=1,function(x) 2*sum(x))
+
+mydata0<-mydata0[(!is.nan(mydata1_allelefreq_normalized)) & (!is.nan(mydata2_allelefreq_normalized)),]
+cuts<-cut(mydata0$POS,mybreaks,labels=FALSE)
+
 mydata1<-t(apply(mydata0[,pop1,with=FALSE],MARGIN=1,FUN=function(x) c(sum(x=="0/0"),sum(x=="0/1" | x=="1/0"),sum(x=="1/1"))))
 mydata2<-t(apply(mydata0[,pop2,with=FALSE],MARGIN=1,FUN=function(x) c(sum(x=="0/0"),sum(x=="0/1" | x=="1/0"),sum(x=="1/1"))))
 mydata1_allelefreq_normalized<-apply(mydata1, MARGIN=1,function(x) 0.001+(x[2]+2*x[3])/(2*sum(x))*0.998)
