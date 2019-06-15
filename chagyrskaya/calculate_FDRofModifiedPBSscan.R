@@ -5,12 +5,13 @@ winsize<-as.numeric(args[1])
 scan.file<-as.character(args[2])
 simulations.file<-as.character(args[3])
 outputfolder<-as.character(args[4]) 
+options(scipen=999)
+
 #simulations.file=paste0("/mnt/scratch/fabrizio/Chagyrskaya/selection/PBS/sims/stats/res_tot_win",winsize,"PBSfixed_win.RData") #res_tot is object with sims
 #scan.file=paste0("/mnt/scratch/fabrizio/Chagyrskaya/selection/PBS/res_tot_win",winsize,"_obs_PBSfixed_win.RData") #res is object with scan on the observed data
 
 #mywinsize<-"100000"
 #outputfolder<-"/mnt/scratch/fabrizio/Chagyrskaya/selection/PBS/sims/stats"
-options(scipen=999)
 
 #modified PBS (with Fst fixed sites)
 {
@@ -49,6 +50,8 @@ library(data.table)
 setwd(outputfolder)
 options(scipen=999)
 #for (winsize in c("5000","25000","50000","100000","500000")){ #
+load(simulations.file)
+load(scan.file)
 
 mybins<-unique(quantile(res_tot$n_AN,seq(1,99,1)/100))
 nbins<-(length(mybins)+1)
@@ -112,10 +115,22 @@ dev.off()
 
 signtemp<-res[res$fdr<0.05,]
 names(signtemp)[1]<-"#CHROM"
-signtemp[["BIN_START"]]<-signtemp[["BIN_START"]]-1
+names(signtemp)[2]<-"INIT"
+#signtemp[["BIN_START"]]<-signtemp[["BIN_START"]]-1
+signtemp[["INIT"]]
+signtemp[['END']]<-signtemp[['INIT']]+as.numeric(winsize)
+signtemp<-signtemp[,c(1,2,ncol(signtemp),3:(ncol(signtemp)-1))]
 write.table(signtemp,file=paste0(myPBS,"_win",winsize,"_sign.bed"),quote=F,row.names=F,sep="\t")
 
 }
+
+#generate background beds
+#note that already removed windows with no informative sites! perfect for enrichment tests!
+res<-res_backup
+res<-res[,c(1,2,2)]
+names(res)<-c("#CHROM","INIT","END")
+res[,3]<-res[,3]+as.numeric(winsize)
+write.table(res,file=paste0("backgroundfixed_win",winsize,".bed"),quote=F,row.names=F,sep="\t")
 
 }
 
