@@ -1,3 +1,4 @@
+#script to combine all simulations together in a single RData file
 args <- commandArgs(trailingOnly = TRUE)
 mywinsize<-as.character(args[1])
 
