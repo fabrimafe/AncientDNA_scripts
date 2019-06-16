@@ -30,7 +30,8 @@ overlap.background.feature.tag<-apply(unname(overlap.background.feature),MARGIN=
 if ( length(overlap.candidate.feature)>0 ) {
 overlap.candidate.feature<-as.data.frame(matrix(unlist(unname(sapply(overlap.candidate.feature,function(x) strsplit(x,"\t")))),ncol=ncol(candidate),byrow=T))
 overlap.candidate.feature.tag<-apply(unname(overlap.candidate.feature),MARGIN=1,FUN=function(x) paste(x[1:3],collapse="."))
-} else { overlap.candidate.feature.tag<-c() }
+n.candidates<-nrow(candidate)-1
+} else { overlap.candidate.feature.tag<-c();n.candidates<-0 }
 background.tag<-apply(unname(background),MARGIN=1,FUN=function(x) paste(x[1:3],collapse="."))
 candidate.tag<-apply(unname(candidate),MARGIN=1,FUN=function(x) paste(x[1:3],collapse="."))
 overlap.background.feature.i<-which(background.tag %in% overlap.background.feature.tag)
@@ -46,7 +47,7 @@ sum(overlap.background.feature.i %in% simulated.candidate.i)
 }
 
 n.simulated.candidate.feature.overlaps<-sapply(sample(length(background.tag),n.simulations), function(x) shift.candidates.and.calculate.overlap(x) )
-p.enrichment<-c(sum(n.simulated.candidate.feature.overlaps<=n.candidate.feature.overlaps)/n.simulations,sum(n.simulated.candidate.feature.overlaps>=n.candidate.feature.overlaps)/n.simulations,n.candidate.feature.overlaps/(nrow(candidate)-1),length(overlap.background.feature.tag)/(nrow(background)-1),n.candidate.feature.overlaps,nrow(candidate)-1)
+p.enrichment<-c(sum(n.simulated.candidate.feature.overlaps<=n.candidate.feature.overlaps)/n.simulations,sum(n.simulated.candidate.feature.overlaps>=n.candidate.feature.overlaps)/n.simulations,n.candidate.feature.overlaps/n.candidates,length(overlap.background.feature.tag)/(nrow(background)-1),n.candidate.feature.overlaps,n.candidates)
 cat(p.enrichment)
 cat('\n')
 } else {
