@@ -20,14 +20,14 @@ candidate<-read.table(candidate.bed.file)
 #candidate.bed.file="~/Downloads/temp_selection/PBS_reichin_A_win100000_sign.bed" #better to take original file instead of single tracts
 #candidate.bed.file="~/Downloads/temp_selection/temp.bed" #better to take original file instead of single tracts
 overlap.background.feature<-system(paste0("bedtools intersect -b ",feature.bed.file," -a ",background.bed.file," -wa  | sort -k1,1n -k2,2n | uniq"),intern=TRUE)
-overlap.background.feature<-as.data.frame(matrix(unlist(unname(sapply(overlap.background.feature,function(x) strsplit(x,"\t")))),ncol=3,byrow=T))
+overlap.background.feature<-as.data.frame(matrix(unlist(unname(sapply(overlap.background.feature,function(x) strsplit(x,"\t")))),ncol=ncol(background),byrow=T))
 overlap.candidate.feature<-system(paste0("bedtools intersect -b ",feature.bed.file," -a ",candidate.bed.file," -wa  | sort -k1,1n -k2,2n | uniq"),intern=TRUE)
-overlap.candidate.feature<-as.data.frame(matrix(unlist(unname(sapply(overlap.candidate.feature,function(x) strsplit(x,"\t")))),ncol=3,byrow=T))
-overlap.background.feature.tag<-apply(overlap.background.feature,MARGIN=1,FUN=function(x) paste(x,collapse="."))
-overlap.candidate.feature.tag<-apply(overlap.candidate.feature,MARGIN=1,FUN=function(x) paste(x,collapse="."))
-background.tag<-apply(background,MARGIN=1,FUN=function(x) paste(x,collapse="."))
+overlap.candidate.feature<-as.data.frame(matrix(unlist(unname(sapply(overlap.candidate.feature,function(x) strsplit(x,"\t")))),ncol=ncol(candidate),byrow=T))
+overlap.background.feature.tag<-apply(unname(overlap.background.feature),MARGIN=1,FUN=function(x) paste(x[1:3],collapse="."))
+overlap.candidate.feature.tag<-apply(unname(overlap.candidate.feature),MARGIN=1,FUN=function(x) paste(x[1:3],collapse="."))
+background.tag<-apply(unname(background),MARGIN=1,FUN=function(x) paste(x[1:3],collapse="."))
 overlap.background.feature.i<-which(background.tag %in% overlap.background.feature.tag)
-candidate.i<-which(overlap.background.feature.tag %in% overlap.candidate.feature.tag)
+candidate.i<-which(background.tag %in% overlap.candidate.feature.tag)
 n.candidate.feature.overlaps<-sum(overlap.background.feature.i %in% candidate.i)
 
 shift.candidates.and.calculate.overlap<-function(shift.candidates) { 
