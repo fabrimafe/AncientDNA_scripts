@@ -16,6 +16,7 @@ n.simulations<-as.numeric(args[4])
 #background.bed.file="~/Downloads/temp_selection/backgroundfixed_win100000.bed"
 #feature.bed.file="~/Downloads/temp_selection/gencode_CDS_protein_coding_merged.bed"
 background<-read.table(background.bed.file)
+candidate<-read.table(candidate.bed.file)
 #candidate.bed.file="~/Downloads/temp_selection/PBS_reichin_A_win100000_sign.bed" #better to take original file instead of single tracts
 #candidate.bed.file="~/Downloads/temp_selection/temp.bed" #better to take original file instead of single tracts
 overlap.background.feature<-system(paste0("bedtools intersect -b ",feature.bed.file," -a ",background.bed.file," -wa  | sort -k1,1n -k2,2n | uniq"),intern=TRUE)
@@ -37,6 +38,6 @@ sum(overlap.background.feature.i %in% simulated.candidate.i)
 }
 
 n.simulated.candidate.feature.overlaps<-sapply(sample(length(background.tag),n.simulations), function(x) shift.candidates.and.calculate.overlap(x) )
-p.enrichment<-c(sum(n.simulated.candidate.feature.overlaps<=n.candidate.feature.overlaps)/n.simulations,sum(n.simulated.candidate.feature.overlaps>=n.candidate.feature.overlaps)/n.simulations)
+p.enrichment<-c(sum(n.simulated.candidate.feature.overlaps<=n.candidate.feature.overlaps)/n.simulations,sum(n.simulated.candidate.feature.overlaps>=n.candidate.feature.overlaps)/n.simulations,n.candidate.feature.overlaps/(nrow(candidate)-1),length(overlap.background.feature.tag)/(nrow(background)-1))
 cat(p.enrichment)
 cat('\n')
