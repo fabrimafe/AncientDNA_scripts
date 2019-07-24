@@ -7,8 +7,10 @@ outputfile<-as.character(args[2])
 winsize_char<-as.character(args[3])
 
 library("data.table")
-mydata0<-fread(cmd=paste0("zcat ",myfile))
+mydata0<-fread(cmd=paste0("zcat ",myfile, "| grep -v '##'"))
+
 #mydata0<-fread(cmd=paste0('zcat /mnt/scratch/fabrizio/Chagyrskaya/selection/PBS/tempfiles/',myfile,' | grep -v "##"'))
+
 winsize<-as.numeric(winsize_char)
 
 theta_pi_f<-function(xdata) {
@@ -33,7 +35,7 @@ theta_H_f<-function(xdata) {
     sum(2*Si*as.numeric(names(Si))^2)/nchr/(nchr-1)
 }
 
-#keep only polymorphism in case not
+
 mydata1<-t(apply(mydata0[,10:12],MARGIN=1,FUN=function(x) c(sum(x=="0/0"),sum(x=="0/1" | x=="1/0"),sum(x=="1/1"))))
 mydata1_n<-apply(mydata1, MARGIN=1,function(x) 2*sum(x))
 mydata_i<-mydata1[,2]+2*mydata1[,3]
@@ -41,6 +43,7 @@ mydata0<-mydata0[mydata_i!=0 & mydata_i!=mydata1_n[1],]
 mydata1<-t(apply(mydata0[,10:12],MARGIN=1,FUN=function(x) c(sum(x=="0/0"),sum(x=="0/1" | x=="1/0"),sum(x=="1/1"))))
 mydata1_n<-apply(mydata1, MARGIN=1,function(x) 2*sum(x))
 mydata_i<-mydata1[,2]+2*mydata1[,3]
+
 
 mybreaks<-seq(min(mydata0$POS)-1,max(mydata0$POS)+winsize/4,winsize/4)
 cuts<-cut(mydata0$POS,mybreaks,labels=FALSE)
