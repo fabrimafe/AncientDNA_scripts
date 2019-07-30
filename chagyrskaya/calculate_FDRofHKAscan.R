@@ -51,10 +51,13 @@ setwd(outputfolder)
 options(scipen=999)
 #for (winsize in c("5000","25000","50000","100000","500000")){ #
 res_tot<-read.table(simulations.file)
-names(res_tot)<-c("CHROM","BIN_START","theta_pi","theta_W","theta_H","n","TajimaD","FayH","isim")
+names(res_tot)<-c("CHROM","BIN_START","P1","D1","isim")
 res<-read.table(scan.file) #/mnt/scratch/fabrizio/Chagyrskaya/selection/PBS/sims/stats/res_tot_win25000H.tab
-names(res)<-c("CHROM","BIN_START","theta_pi","theta_W","theta_H","n","TajimaD","FayH")
-
+names(res)<-c("CHROM","BIN_START","P1","D1")
+res$n<-res$P1+res$D1
+res$HKA<-(res$P1+1)/(res$D1+1)
+res_tot$n<-res_tot$P1+res_tot$D1
+res_tot$HKA<-(res_tot$P1+1)/(res_tot$D1+1)
 mybins<-unique(quantile(res_tot$n,seq(1,99,1)/100))
 nbins<-(length(mybins)+1)
 cuts<-as.numeric(as.character(cut(res_tot$n,c(-Inf,mybins, Inf),labels=1:nbins)))
@@ -72,7 +75,7 @@ observed_bins<-sort(as.numeric(names(table(cuts_obs))))
 
 
 res_backup<-res
-for ( myPBS in c("TajimaD","FayH"))
+for ( myPBS in c("HKA"))
 {
 res<-res_backup
 res<-res[!is.na(res[[myPBS]]),]

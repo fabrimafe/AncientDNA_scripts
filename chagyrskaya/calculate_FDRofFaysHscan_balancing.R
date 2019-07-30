@@ -74,19 +74,20 @@ observed_bins<-sort(as.numeric(names(table(cuts_obs))))
 res_backup<-res
 for ( myPBS in c("TajimaD","FayH"))
 {
+myPBS_label<-paste0(myPBS,"balancing")
 res<-res_backup
 res<-res[!is.na(res[[myPBS]]),]
 cuts_obs<-as.numeric(as.character(cut(res$n,c(-Inf,mybins, Inf),labels=1:nbins)))
 observed_bins<-sort(as.numeric(names(table(cuts_obs))))
 #PBS_N
-fdrs_l<-lapply(observed_bins, function(x) empiricall_fdr(res[[myPBS]][cuts_obs==x],res_tot[[myPBS]][cuts==x]))
+fdrs_l<-lapply(observed_bins, function(x) empiricall_fdr(-res[[myPBS]][cuts_obs==x],-res_tot[[myPBS]][cuts==x]))
 res$fdr<-0
 counter<-1
 for ( i in observed_bins ){
 res$fdr[cuts_obs==i]<-fdrs_l[[counter]]
 counter<-counter+1
 }
-pval_l<-lapply(observed_bins, function(x) empirical_pvalue(res[[myPBS]][cuts_obs==x],res_tot[[myPBS]][cuts==x]))
+pval_l<-lapply(observed_bins, function(x) empirical_pvalue(-res[[myPBS]][cuts_obs==x],-res_tot[[myPBS]][cuts==x]))
 res$pvalue<-0
 counter<-1
 for ( i in observed_bins ){
@@ -99,19 +100,19 @@ library(RColorBrewer)
 mycols=rep(brewer.pal(n = 8, name = "Dark2"),3)
 res<-res[with(res, order(res$CHROM,res$BIN_START)), ] 
 res$start_resc<-1:nrow(res)
-png(paste0(myPBS,"_win",winsize,"_fdr.png"),width = 465, height = 225, units='mm', res = 300)
+png(paste0(myPBS_label,"_win",winsize,"_fdr.png"),width = 465, height = 225, units='mm', res = 300)
 plot(res$start_resc,-log(res$fdr+0.000001,10),pch=19,col=mycols[res$CHROM],ylim=c(0,6.1),ylab="-log(FDR,10)",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
 abline(h=-log(0.05+0.000001,10))
 dev.off()
 
-png(paste0(myPBS,"_win",winsize,"_pvalue.png"),width = 465, height = 225, units='mm', res = 300)
+png(paste0(myPBS_label,"_win",winsize,"_pvalue.png"),width = 465, height = 225, units='mm', res = 300)
 plot(res$start_resc,-log(res$pvalue+0.000001,10),pch=19,col=mycols[res$CHROM],ylim=c(0,6.1),ylab="-log(p.value,10)",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
 #abline(h=-log(0.05+0.000001,10))
 dev.off()
 
 res[[myPBS]][res[[myPBS]]>20]<-20
-png(paste0(myPBS,"_win",winsize,".png"),width = 465, height = 225, units='mm', res = 300)
-plot(res$start_resc,res[[myPBS]],pch=19,col=mycols[res$CHROM],ylim=c(0,max(res[[myPBS]])+0.1),ylab=myPBS,xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
+png(paste0(myPBS_label,"_win",winsize,".png"),width = 465, height = 225, units='mm', res = 300)
+plot(res$start_resc,res[[myPBS]],pch=19,col=mycols[res$CHROM],ylim=c(0,max(res[[myPBS]])+0.1),ylab=myPBS_label,xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
 dev.off()
 
 signtemp<-res[res$fdr<0.05,]
@@ -121,7 +122,7 @@ names(signtemp)[2]<-"INIT"
 signtemp[["INIT"]]
 signtemp[['END']]<-signtemp[['INIT']]+as.numeric(winsize)
 signtemp<-signtemp[,c(1,2,ncol(signtemp),3:(ncol(signtemp)-1))]
-write.table(signtemp,file=paste0(myPBS,"_win",winsize,"_sign.bed"),quote=F,row.names=F,sep="\t")
+write.table(signtemp,file=paste0(myPBS_label,"_win",winsize,"_sign.bed"),quote=F,row.names=F,sep="\t")
 
 signtemp<-res[order(res$fdr),]
 signtemp<-signtemp[1:500,]
@@ -131,7 +132,7 @@ names(signtemp)[2]<-"INIT"
 signtemp[["INIT"]]
 signtemp[['END']]<-signtemp[['INIT']]+as.numeric(winsize)
 signtemp<-signtemp[,c(1,2,ncol(signtemp),3:(ncol(signtemp)-1))]
-write.table(signtemp,file=paste0(myPBS,"_win",winsize,"_sign_top500.bed"),quote=F,row.names=F,sep="\t")
+write.table(signtemp,file=paste0(myPBS_label,"_win",winsize,"_sign_top500.bed"),quote=F,row.names=F,sep="\t")
 
 signtemp<-res[order(res$pvalue),]
 names(signtemp)[1]<-"#CHROM"
@@ -140,7 +141,7 @@ names(signtemp)[2]<-"INIT"
 signtemp[["INIT"]]
 signtemp[['END']]<-signtemp[['INIT']]+as.numeric(winsize)
 signtemp<-signtemp[,c(1,2,ncol(signtemp),3:(ncol(signtemp)-1))]
-write.table(signtemp,file=paste0(myPBS,"_win",winsize,"_res.bed"),quote=F,row.names=F,sep="\t")
+write.table(signtemp,file=paste0(myPBS_label,"_win",winsize,"_res.bed"),quote=F,row.names=F,sep="\t")
 
 }
 
@@ -150,7 +151,7 @@ res<-res_backup
 res<-res[,c(1,2,2)]
 names(res)<-c("#CHROM","INIT","END")
 res[,3]<-res[,3]+as.numeric(winsize)
-write.table(res,file=paste0("backgroundfixed_win",winsize,"_",myPBS,".bed"),quote=F,row.names=F,sep="\t")
+write.table(res,file=paste0("backgroundfixed_win",winsize,"_",myPBS_label,".bed"),quote=F,row.names=F,sep="\t")
 
 }
 

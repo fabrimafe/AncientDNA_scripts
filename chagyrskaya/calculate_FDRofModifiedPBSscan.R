@@ -70,6 +70,10 @@ names(res_tot)[1:2]<-c("CHROM","BIN_START")
 
 
 res_backup<-res
+if (!is.numeric(res[1,1])){
+for (icol in 2:ncol(res)){ res[,icol]<-as.numeric(as.character(res[,icol])) }
+for (icol in 2:ncol(res_tot)){ res_tot[,icol]<-as.numeric(as.character(res_tot[,icol])) }
+}
 for ( myPBS in c("PBS_weirn_A","PBS_weirn_N","PBS_weirn_D","PBS_reichin_N","PBS_reichn_N","PBS_reichin_A","PBS_reichin_D","PBS_reichn_A","PBS_reichn_D"))
 {
 res<-res_backup
@@ -104,8 +108,8 @@ abline(h=-log(0.05+0.000001,10))
 dev.off()
 
 png(paste0(myPBS,"_win",winsize,"_pvalue.png"),width = 465, height = 225, units='mm', res = 300)
-plot(res$start_resc,-log(res$pvalue+0.000001,10),pch=19,col=mycols[res$CHROM],ylim=c(0,6.1),ylab="-log(FDR,10)",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
-abline(h=-log(0.05+0.000001,10))
+plot(res$start_resc,-log(res$pvalue+0.000001,10),pch=19,col=mycols[res$CHROM],ylim=c(0,6.1),ylab="-log(p.value,10)",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
+#abline(h=-log(0.05+0.000001,10))
 dev.off()
 
 res[[myPBS]][res[[myPBS]]>20]<-20
@@ -121,6 +125,25 @@ signtemp[["INIT"]]
 signtemp[['END']]<-signtemp[['INIT']]+as.numeric(winsize)
 signtemp<-signtemp[,c(1,2,ncol(signtemp),3:(ncol(signtemp)-1))]
 write.table(signtemp,file=paste0(myPBS,"_win",winsize,"_sign.bed"),quote=F,row.names=F,sep="\t")
+
+signtemp<-res[order(res$fdr),]
+signtemp<-signtemp[1:500,]
+names(signtemp)[1]<-"#CHROM"
+names(signtemp)[2]<-"INIT"
+#signtemp[["BIN_START"]]<-signtemp[["BIN_START"]]-1
+signtemp[["INIT"]]
+signtemp[['END']]<-signtemp[['INIT']]+as.numeric(winsize)
+signtemp<-signtemp[,c(1,2,ncol(signtemp),3:(ncol(signtemp)-1))]
+write.table(signtemp,file=paste0(myPBS,"_win",winsize,"_sign_top500.bed"),quote=F,row.names=F,sep="\t")
+
+signtemp<-res[order(res$pvalue),]
+names(signtemp)[1]<-"#CHROM"
+names(signtemp)[2]<-"INIT"
+#signtemp[["BIN_START"]]<-signtemp[["BIN_START"]]-1
+signtemp[["INIT"]]
+signtemp[['END']]<-signtemp[['INIT']]+as.numeric(winsize)
+signtemp<-signtemp[,c(1,2,ncol(signtemp),3:(ncol(signtemp)-1))]
+write.table(signtemp,file=paste0(myPBS,"_win",winsize,"_res.bed"),quote=F,row.names=F,sep="\t")
 
 }
 

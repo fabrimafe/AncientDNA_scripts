@@ -50,20 +50,18 @@ library(data.table)
 setwd(outputfolder)
 options(scipen=999)
 #for (winsize in c("5000","25000","50000","100000","500000")){ #
-res_tot<-read.table(simulations.file)
-names(res_tot)<-c("CHROM","BIN_START","theta_pi","theta_W","theta_H","n","TajimaD","FayH","isim")
-res<-read.table(scan.file) #/mnt/scratch/fabrizio/Chagyrskaya/selection/PBS/sims/stats/res_tot_win25000H.tab
-names(res)<-c("CHROM","BIN_START","theta_pi","theta_W","theta_H","n","TajimaD","FayH")
+load(simulations.file)
+load(scan.file)
 
-mybins<-unique(quantile(res_tot$n,seq(1,99,1)/100))
+mybins<-unique(quantile(res_tot$n_AN,seq(1,99,1)/100))
 nbins<-(length(mybins)+1)
-cuts<-as.numeric(as.character(cut(res_tot$n,c(-Inf,mybins, Inf),labels=1:nbins)))
-cuts_obs<-as.numeric(as.character(cut(res$n,c(-Inf,mybins, Inf),labels=1:nbins)))
+cuts<-as.numeric(as.character(cut(res_tot$n_AN,c(-Inf,mybins, Inf),labels=1:nbins)))
+cuts_obs<-as.numeric(as.character(cut(res$n_AN,c(-Inf,mybins, Inf),labels=1:nbins)))
 observed_bins<-sort(as.numeric(names(table(cuts_obs))))
 #sapply(1:nbins,function(x) quantile(res_tot$PBS[cuts==x],0.999))
 #ok, this is -value per window.
-#names(res)[1:2]<-c("CHROM","BIN_START")
-#names(res_tot)[1:2]<-c("CHROM","BIN_START")
+names(res)[1:2]<-c("CHROM","BIN_START")
+names(res_tot)[1:2]<-c("CHROM","BIN_START")
 
 #is.na(res$fst_weircochram_DN)
 #res_tot$fst_weircochram_AN[res_tot$fst_weircochram_AN==1]
@@ -72,56 +70,48 @@ observed_bins<-sort(as.numeric(names(table(cuts_obs))))
 
 
 res_backup<-res
-for ( myPBS in c("TajimaD","FayH"))
+for ( myPBS in c("PBS_weirn_A","PBS_weirn_N","PBS_weirn_D","PBS_reichin_N","PBS_reichn_N","PBS_reichin_A","PBS_reichin_D","PBS_reichn_A","PBS_reichn_D"))
 {
 res<-res_backup
 res<-res[!is.na(res[[myPBS]]),]
-cuts_obs<-as.numeric(as.character(cut(res$n,c(-Inf,mybins, Inf),labels=1:nbins)))
+cuts_obs<-as.numeric(as.character(cut(res$n_AN,c(-Inf,mybins, Inf),labels=1:nbins)))
 observed_bins<-sort(as.numeric(names(table(cuts_obs))))
+print(myPBS)
 #PBS_N
-fdrs_l<-lapply(observed_bins, function(x) empiricall_fdr(res[[myPBS]][cuts_obs==x],res_tot[[myPBS]][cuts==x]))
+fdrs_l<-lapply(observed_bins, function(x) empiricall_fdr(-res[[myPBS]][cuts_obs==x],-res_tot[[myPBS]][cuts==x]))
 res$fdr<-0
 counter<-1
 for ( i in observed_bins ){
 res$fdr[cuts_obs==i]<-fdrs_l[[counter]]
 counter<-counter+1
 }
-pval_l<-lapply(observed_bins, function(x) empirical_pvalue(res[[myPBS]][cuts_obs==x],res_tot[[myPBS]][cuts==x]))
+pval_l<-lapply(observed_bins, function(x) empirical_pvalue(-res[[myPBS]][cuts_obs==x],-res_tot[[myPBS]][cuts==x]))
 res$pvalue<-0
 counter<-1
 for ( i in observed_bins ){
 res$pvalue[cuts_obs==i]<-pval_l[[counter]]
 counter<-counter+1
 }
-
-#is.na(res$fdr)
-library(RColorBrewer)
-mycols=rep(brewer.pal(n = 8, name = "Dark2"),3)
-res<-res[with(res, order(res$CHROM,res$BIN_START)), ] 
-res$start_resc<-1:nrow(res)
-png(paste0(myPBS,"_win",winsize,"_fdr.png"),width = 465, height = 225, units='mm', res = 300)
-plot(res$start_resc,-log(res$fdr+0.000001,10),pch=19,col=mycols[res$CHROM],ylim=c(0,6.1),ylab="-log(FDR,10)",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
-abline(h=-log(0.05+0.000001,10))
-dev.off()
-
-png(paste0(myPBS,"_win",winsize,"_pvalue.png"),width = 465, height = 225, units='mm', res = 300)
-plot(res$start_resc,-log(res$pvalue+0.000001,10),pch=19,col=mycols[res$CHROM],ylim=c(0,6.1),ylab="-log(p.value,10)",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
-#abline(h=-log(0.05+0.000001,10))
-dev.off()
-
-res[[myPBS]][res[[myPBS]]>20]<-20
-png(paste0(myPBS,"_win",winsize,".png"),width = 465, height = 225, units='mm', res = 300)
-plot(res$start_resc,res[[myPBS]],pch=19,col=mycols[res$CHROM],ylim=c(0,max(res[[myPBS]])+0.1),ylab=myPBS,xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
-dev.off()
-
-signtemp<-res[res$fdr<0.05,]
-names(signtemp)[1]<-"#CHROM"
-names(signtemp)[2]<-"INIT"
-#signtemp[["BIN_START"]]<-signtemp[["BIN_START"]]-1
-signtemp[["INIT"]]
-signtemp[['END']]<-signtemp[['INIT']]+as.numeric(winsize)
-signtemp<-signtemp[,c(1,2,ncol(signtemp),3:(ncol(signtemp)-1))]
-write.table(signtemp,file=paste0(myPBS,"_win",winsize,"_sign.bed"),quote=F,row.names=F,sep="\t")
+# 
+# #is.na(res$fdr)
+# library(RColorBrewer)
+# mycols=rep(brewer.pal(n = 8, name = "Dark2"),3)
+# res<-res[with(res, order(res$CHROM,res$BIN_START)), ] 
+# res$start_resc<-1:nrow(res)
+# png(paste0(myPBS,"_win",winsize,"_fdr.png"),width = 465, height = 225, units='mm', res = 300)
+# plot(res$start_resc,-log(res$fdr+0.000001,10),pch=19,col=mycols[res$CHROM],ylim=c(0,6.1),ylab="-log(FDR,10)",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
+# abline(h=-log(0.05+0.000001,10))
+# dev.off()
+# 
+# png(paste0(myPBS,"_win",winsize,"_pvalue.png"),width = 465, height = 225, units='mm', res = 300)
+# plot(res$start_resc,-log(res$pvalue+0.000001,10),pch=19,col=mycols[res$CHROM],ylim=c(0,6.1),ylab="-log(FDR,10)",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
+# abline(h=-log(0.05+0.000001,10))
+# dev.off()
+# 
+# res[[myPBS]][res[[myPBS]]>20]<-20
+# png(paste0(myPBS,"_win",winsize,".png"),width = 465, height = 225, units='mm', res = 300)
+# plot(res$start_resc,res[[myPBS]],pch=19,col=mycols[res$CHROM],ylim=c(0,max(res[[myPBS]])+0.1),ylab="PBS",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
+# dev.off()
 
 signtemp<-res[order(res$fdr),]
 signtemp<-signtemp[1:500,]
@@ -131,26 +121,17 @@ names(signtemp)[2]<-"INIT"
 signtemp[["INIT"]]
 signtemp[['END']]<-signtemp[['INIT']]+as.numeric(winsize)
 signtemp<-signtemp[,c(1,2,ncol(signtemp),3:(ncol(signtemp)-1))]
-write.table(signtemp,file=paste0(myPBS,"_win",winsize,"_sign_top500.bed"),quote=F,row.names=F,sep="\t")
-
-signtemp<-res[order(res$pvalue),]
-names(signtemp)[1]<-"#CHROM"
-names(signtemp)[2]<-"INIT"
-#signtemp[["BIN_START"]]<-signtemp[["BIN_START"]]-1
-signtemp[["INIT"]]
-signtemp[['END']]<-signtemp[['INIT']]+as.numeric(winsize)
-signtemp<-signtemp[,c(1,2,ncol(signtemp),3:(ncol(signtemp)-1))]
-write.table(signtemp,file=paste0(myPBS,"_win",winsize,"_res.bed"),quote=F,row.names=F,sep="\t")
+write.table(signtemp,file=paste0(myPBS,"_win",winsize,"_top500.bed"),quote=F,row.names=F,sep="\t")
 
 }
 
-#generate background beds
-#note that already removed windows with no informative sites! perfect for enrichment tests!
-res<-res_backup
-res<-res[,c(1,2,2)]
-names(res)<-c("#CHROM","INIT","END")
-res[,3]<-res[,3]+as.numeric(winsize)
-write.table(res,file=paste0("backgroundfixed_win",winsize,"_",myPBS,".bed"),quote=F,row.names=F,sep="\t")
+# #generate background beds
+# #note that already removed windows with no informative sites! perfect for enrichment tests!
+# res<-res_backup
+# res<-res[,c(1,2,2)]
+# names(res)<-c("#CHROM","INIT","END")
+# res[,3]<-res[,3]+as.numeric(winsize)
+# write.table(res,file=paste0("backgroundfixed_win",winsize,".bed"),quote=F,row.names=F,sep="\t")
 
 }
 
