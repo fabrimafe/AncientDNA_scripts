@@ -47,7 +47,13 @@ sum(overlap.background.feature.i %in% simulated.candidate.i)
 }
 
 n.simulated.candidate.feature.overlaps<-sapply(sample(length(background.tag),n.simulations), function(x) shift.candidates.and.calculate.overlap(x) )
-p.enrichment<-c(sum(n.simulated.candidate.feature.overlaps<=n.candidate.feature.overlaps)/n.simulations,sum(n.simulated.candidate.feature.overlaps>=n.candidate.feature.overlaps)/n.simulations,n.candidate.feature.overlaps/n.candidates,length(overlap.background.feature.tag)/nrow(background),n.candidate.feature.overlaps,n.candidates)
+p.enrichment<-c(
+	sum(n.simulated.candidate.feature.overlaps<=n.candidate.feature.overlaps)/n.simulations, #proportion of sims lower than data
+	sum(n.simulated.candidate.feature.overlaps>=n.candidate.feature.overlaps)/n.simulations, #proportion of sims higher than data
+	n.candidate.feature.overlaps/n.candidates,						 #proportion of candidates overlapping
+	length(overlap.background.feature.tag)/nrow(background),				 #proportion of background overlapping
+	n.candidate.feature.overlaps,								 #length overlap
+	n.candidates)										 #n.candidates
 cat(p.enrichment)
 cat('\n')
 } else {
