@@ -25,7 +25,7 @@ for k in {1..22} X; do
 	manifesto=manifesto/chr${k}_mask.bed.gz
 	zcat genotypes/chr${k}.noRB.vcf.gz | sed 's/\:/\t/g' | awk -v OFS='\t' '{if ($18>2 && $18<10 && $6>30){print $1,$2-1,$2}}' | sort -k1,1 -k2,2n > $tempfile
 	bedtools merge -i $tempfile | bgzip -f > $manifesto; mv $manifesto $tempfile
-	subtractBed -a <(intersectBed -a <(tabix /mnt/sequencedb/PopGen/cesare/hg19/bedfiles/heng_map35_99.TRF.bed.gz ${k}) -b $tempfile) -b pos_indelsAllhighcov_chrAll.bed | sort -k1,1 -k2,2n | bgzip -f > $manifesto
+	subtractBed -a <(intersectBed -a <(tabix /mnt/sequencedb/PopGen/cesare/hg19/bedfiles/heng_map35_99.TRF.bed.gz ${k}) -b $tempfile) -b $indelsfile | sort -k1,1 -k2,2n | bgzip -f > $manifesto
 	rm $tempfile
 done
 
