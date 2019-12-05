@@ -18,6 +18,10 @@ vcf2bed () {
 awk -v OFS='\t' '{chr=$1;pos=$2;$1="";$2="";print chr,pos-1,pos,$0}'
 }
 
+vcf2bed2 () {
+awk -v OFS='\t' '{print $1,$2-1,$0}'
+}
+
 tab2bed () {
 awk -v OFS='\t' '{print $1,$2-1,$2}'
 }
