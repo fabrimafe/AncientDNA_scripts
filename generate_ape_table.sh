@@ -23,7 +23,7 @@ awk -v OFS='\t' '{
 if (convert>0){for (i = 1; i <= length($1); i++){print "chr"mychr,counter,substr($1,i,1);counter=counter+1}};
 if (substr($1,1,1)==">"){
 convert=0;for (k = 1; k <= 9; k++){if (substr($1,2,1)==k){convert=convert+1;counter=1;}};
-for (k = 1; k <= 9; k++){if (substr($1,3,1)==k){longautosome=longautosome+1;}}; 
+for (k = 0; k <= 9; k++){if (substr($1,3,1)==k){longautosome=longautosome+1;}}; 
 if (longautosome>0 && convert>0){mychr=substr($1,2,2)} else if (longautosome==0 && convert>0){mychr=substr($1,2,1)};
 longautosome=0;
 }}' 
