@@ -165,6 +165,34 @@ if ($colA==myder || $colA==myanc){counter=counter+1;}}}
 END{nsites[counterblocks]=counter; for (i = 0; i <= (counterblocks); i++){print nsites[i]}}'
 }
 
+FABCM_jk_f () {
+SIZEBLOCKJACKNIFE=$1; mycolA=$2;
+awk -v sizejk=$SIZEBLOCKJACKNIFE -v colA=$mycolA -v OFS='\t' 'BEGIN{counternB=0;counternAB=0;counternBM=0;counternABM=0;counterblocks=0;mychr=0;mypos=0;}{myder="H";myanc="H";myderM="H";myancM="H";
+if (NR==1){mychr=$1;mypos=$2} else if ($1!=mychr || $2>(mypos+sizejk))
+{
+nB[counterblocks]=counternB;
+nAB[counterblocks]=counternAB;
+nBM[counterblocks]=counternBM;
+nABM[counterblocks]=counternABM;
+mypos=$2;mychr=$1;counternB=0;counternAB=0;counternBM=0;counternABM=0;counterblocks=counterblocks+1;};
+if ($6!="N" && $6!="-" && $7!="N" && $7!="-"){
+if ($6==$4 && $7==$4){myderM=$5; myancM=$4;} else if ($6==$5 && $7==$5){myderM=$4;myancM=$5;};
+if ($6==$4){myder=$5;myanc=$4;} else if ($6==$5){myder=$4;myanc=$5;};
+if ($colA==myder || $colA==myanc){counternB=counternB+1;};
+if ($colA==myder ){counternAB=counternAB+1;};
+if ($colA==myderM || $colA==myancM){counternBM=counternABM+1;};
+if ($colA==myderM ){counternABM=counternABM+1;}}
+}
+END{
+nB[counterblocks]=counternB;
+nAB[counterblocks]=counternAB;
+nBM[counterblocks]=counternBM;
+nABM[counterblocks]=counternABM;
+for (i = 0; i <= (counterblocks); i++){print nAB[i],nB[i],nABM[i],nBM[i]}
+}'
+}
+
+
 
 #calibration
 parsems_calibration () {
