@@ -184,7 +184,7 @@ if ($6==$4 && $7==$4){myderM=$5; myancM=$4;} else if ($6==$5 && $7==$5){myderM=$
 if ($6==$4){myder=$5;myanc=$4;} else if ($6==$5){myder=$4;myanc=$5;};
 if ($colA==myder || $colA==myanc){counternB=counternB+1;};
 if ($colA==myder ){counternAB=counternAB+1;};
-if ($colA==myderM || $colA==myancM){counternBM=counternABM+1;};
+if ($colA==myderM || $colA==myancM){counternBM=counternBM+1;};
 if ($colA==myderM ){counternABM=counternABM+1;}}
 }
 END{
@@ -237,6 +237,71 @@ if (!($col1==$col2 && $col1==$ape1)){
   }}};
   pos=$2;
 }END{
+for (mi = 0; mi <= iblock; mi++){printf "%d\t%d\t%d\t%d\n",i1[mi],i2[mi],common[mi],tot[mi]}
+}'
+}
+
+bs_othersequal5_wronglikeKay () {
+awk -v col1=$1 -v col2=$2 -v ape1=$3 -v ape2=$4 -v ape3=$5 -v ape4=$6 -v ape5=$7 'BEGIN{count1=0;count2=0;iblock=0;counterpos=0;pos=0;
+tot[iblock]=0;common[iblock]=0;i2[iblock]=0;i1[iblock]=0;i1tot=0;i2tot=0;}{
+if (NR>1){counterpos=counterpos+$2-pos};
+if ($col1!="N" && $col2!="N" && $col1!="-" && $col2!="-" && $ape1!="N" && $ape1!="-" && $ape1==$ape2 && $ape1==$ape3 && $ape1==$ape4 && $ape1==$ape5)
+    {
+    if (counterpos>5000000){counterpos=0;iblock=iblock+1;tot[iblock]=0;common[iblock]=0;i2[iblock]=0;i1[iblock]=0;};
+    tot[iblock]=tot[iblock]+1;
+    if (!($col1==$col2 && $col1==$ape1 && ($col1=="A" || $col1=="T" || $col1=="C" || $col1=="G")))
+        {
+        if ($col1==$ape1){state1=0} else if ($col1=="A" || $col1=="T" || $col1=="C" || $col1=="G"){state1=1} else {state1=2;
+        if ($col1=="M"){myarc1a="A";myarc1b="C"} else if ($col1=="R"){myarc1a="A";myarc1b="G"} else if ($col1=="W"){myarc1a="A";myarc1b="T"} else if ($col1=="S"){myarc1a="C";myarc1b="G"} else if ($col1=="Y"){myarc1a="C";myarc1b="T"} else if ($col1=="K"){myarc1a="G";myarc1b="T"}};     
+        if ($col2==$ape1){state1=0} else if ($col2=="A" || $col2=="T" || $col2=="C" || $col2=="G"){state2=1} else {state2=2;
+        if ($col2=="M"){myarc2a="A";myarc2b="C"} else if ($col2=="R"){myarc2a="A";myarc2b="G"} else if ($col2=="W"){myarc2a="A";myarc2b="T"} else if ($col2=="S"){myarc2a="C";myarc2b="G"} else if ($col2=="Y"){myarc2a="C";myarc2b="T"} else if ($col2=="K"){myarc2a="G";myarc2b="T"}};
+        if (state1==1) {i1[iblock]=i1[iblock]+1;tot[iblock]=tot[iblock]+1;};
+        if (state2==1) {i2[iblock]=i2[iblock]+1;tot[iblock]=tot[iblock]+1;};
+        if (state1==2) {i1[iblock]=i1[iblock]+0.5;tot[iblock]=tot[iblock]+1;};
+        if (state2==2) {i2[iblock]=i2[iblock]+0.5;tot[iblock]=tot[iblock]+1;};
+  }};
+  pos=$2;
+  }END{
+for (mi = 0; mi <= iblock; mi++){printf "%d\t%d\t%d\t%d\n",i1[mi],i2[mi],common[mi],tot[mi]}
+}'
+}
+
+
+bs_othersequal5_deterministic () {
+awk -v col1=$1 -v col2=$2 -v ape1=$3 -v ape2=$4 -v ape3=$5 -v ape4=$6 -v ape5=$7 'BEGIN{count1=0;count2=0;iblock=0;counterpos=0;pos=0;
+tot[iblock]=0;common[iblock]=0;i2[iblock]=0;i1[iblock]=0;i1tot=0;i2tot=0;}{
+if (NR>1){counterpos=counterpos+$2-pos};
+if ($col1!="N" && $col2!="N" && $col1!="-" && $col2!="-" && $ape1!="N" && $ape1!="-" && $ape1==$ape2 && $ape1==$ape3 && $ape1==$ape4 && $ape1==$ape5)
+    {
+    if (counterpos>5000000){counterpos=0;iblock=iblock+1;tot[iblock]=0;common[iblock]=0;i2[iblock]=0;i1[iblock]=0;};
+    tot[iblock]=tot[iblock]+1;
+    if (!($col1==$col2 && $col1==$ape1 && ($col1=="A" || $col1=="T" || $col1=="C" || $col1=="G")))
+        {
+	state1=3;state2=3;myarc1a=0;myarc1b=0;myarc2a=0;myarc2b=0;
+        if ($col1==$ape1){state1=0} else if ($col1=="A" || $col1=="T" || $col1=="C" || $col1=="G"){state1=1} else {state1=2;
+        if ($col1=="M"){myarc1a="A";myarc1b="C"} else if ($col1=="R"){myarc1a="A";myarc1b="G"} else if ($col1=="W"){myarc1a="A";myarc1b="T"} else if ($col1=="S"){myarc1a="C";myarc1b="G"} else if ($col1=="Y"){myarc1a="C";myarc1b="T"} else if ($col1=="K"){myarc1a="G";myarc1b="T"}};     
+        if ($col2==$ape1){state2=0} else if ($col2=="A" || $col2=="T" || $col2=="C" || $col2=="G"){state2=1} else {state2=2;
+        if ($col2=="M"){myarc2a="A";myarc2b="C"} else if ($col2=="R"){myarc2a="A";myarc2b="G"} else if ($col2=="W"){myarc2a="A";myarc2b="T"} else if ($col2=="S"){myarc2a="C";myarc2b="G"} else if ($col2=="Y"){myarc2a="C";myarc2b="T"} else if ($col2=="K"){myarc2a="G";myarc2b="T"}};
+        if ($col1==$col2 && state1==1) { common[iblock]=common[iblock]+1; tot[iblock]=tot[iblock]+1;} else
+        if (state1==1 && state2==0) {i1[iblock]=i1[iblock]+1;tot[iblock]=tot[iblock]+1;} else
+        if (state1==0 && state2==1) {i2[iblock]=i2[iblock]+1;tot[iblock]=tot[iblock]+1;} else
+        if (state1==2 && state2==0) {i1[iblock]=i1[iblock]+0.5;tot[iblock]=tot[iblock]+1;} else
+        if (state1==0 && state2==2) {i2[iblock]=i2[iblock]+0.5;tot[iblock]=tot[iblock]+1;} else
+        if (state1==2 && state2==2 && state1a==state2a && state1b==state2b)
+            {
+            common[iblock]=common[iblock]+0.25;i1[iblock]=i1[iblock]+0.25;i2[iblock]=i2[iblock]+0.25;tot[iblock]=tot[iblock]+1;
+            } else
+        if (state1==2 && state2==1 && ( myarc1a==$col2 || myarc1b==$col2) && ( myarc1a==$ape1 || myarc1b==$ape1))
+            {
+            common[iblock]=common[iblock]+0.5;i2[iblock]=i2[iblock]+0.5;tot[iblock]=tot[iblock]+1;
+            } else
+        if (state1==1 && state2==2 && ( myarc2a==$col1 || myarc2b==$col1) && ( myarc2a==$ape1 || myarc2b==$ape1))
+            {
+            common[iblock]=common[iblock]+0.5;i1[iblock]=i1[iblock]+0.5;tot[iblock]=tot[iblock]+1;
+            };
+  }};
+  pos=$2;
+  }END{
 for (mi = 0; mi <= iblock; mi++){printf "%d\t%d\t%d\t%d\n",i1[mi],i2[mi],common[mi],tot[mi]}
 }'
 }
