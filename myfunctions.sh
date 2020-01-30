@@ -180,7 +180,7 @@ if ($6==$4 && $7==$4){myderM=$5; myancM=$4;} else if ($6==$5 && $7==$5){myderM=$
 if ($6==$4){myder=$5;myanc=$4;} else if ($6==$5){myder=$4;myanc=$5;};
 if ($colA==myder || $colA==myanc){counternB=counternB+1;};
 if ($colA==myder ){counternAB=counternAB+1;};
-if ($colA==myderM || $colA==myancM){counternBM=counternABM+1;};
+if ($colA==myderM || $colA==myancM){counternBM=counternBM+1;};
 if ($colA==myderM ){counternABM=counternABM+1;}}
 }
 END{
