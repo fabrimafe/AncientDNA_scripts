@@ -253,7 +253,7 @@ if ($col1!="N" && $col2!="N" && $col1!="-" && $col2!="-" && $ape1!="N" && $ape1!
         {
         if ($col1==$ape1){state1=0} else if ($col1=="A" || $col1=="T" || $col1=="C" || $col1=="G"){state1=1} else {state1=2;
         if ($col1=="M"){myarc1a="A";myarc1b="C"} else if ($col1=="R"){myarc1a="A";myarc1b="G"} else if ($col1=="W"){myarc1a="A";myarc1b="T"} else if ($col1=="S"){myarc1a="C";myarc1b="G"} else if ($col1=="Y"){myarc1a="C";myarc1b="T"} else if ($col1=="K"){myarc1a="G";myarc1b="T"}};     
-        if ($col2==$ape1){state1=0} else if ($col2=="A" || $col2=="T" || $col2=="C" || $col2=="G"){state2=1} else {state2=2;
+        if ($col2==$ape1){state2=0} else if ($col2=="A" || $col2=="T" || $col2=="C" || $col2=="G"){state2=1} else {state2=2;
         if ($col2=="M"){myarc2a="A";myarc2b="C"} else if ($col2=="R"){myarc2a="A";myarc2b="G"} else if ($col2=="W"){myarc2a="A";myarc2b="T"} else if ($col2=="S"){myarc2a="C";myarc2b="G"} else if ($col2=="Y"){myarc2a="C";myarc2b="T"} else if ($col2=="K"){myarc2a="G";myarc2b="T"}};
         if (state1==1) {i1[iblock]=i1[iblock]+1;tot[iblock]=tot[iblock]+1;};
         if (state2==1) {i2[iblock]=i2[iblock]+1;tot[iblock]=tot[iblock]+1;};
