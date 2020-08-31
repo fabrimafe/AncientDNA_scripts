@@ -1,7 +1,7 @@
 #Steffi's analyses for the Chagyrskaya paper
 ### Do standard D-stats with Chagyrskaya
 # transversions only, Alt-Vin-Den-Chag manifesto filter
-
+#but also look at /home/fabrizio/github/ancientDNA_scripts/chagyrskaya/mez1_EffectsOfContamination.R
 
 ######
 
@@ -216,6 +216,20 @@ Rscript /mnt/expressions/steffi/D/scripts/catalog_chagyrskaya3.R
 # orginal flipped: fixed derived in Africans, ancestral in Nean+Den
 cd /mnt/scratch/steffi/D/Chagyrskaya/catalog_archaic_derived_01
 Rscript /mnt/expressions/steffi/D/scripts/catalog_chagyrskaya4.R
+#  age_category structure_id                               structure
+#1            4  Allen:10333                            STR_striatum
+#2            1  Allen:10333                            STR_striatum
+#3            1  Allen:10294 HIP_hippocampus (hippocampal formation)
+#4            1  Allen:10173      DFC_dorsolateral prefrontal cortex
+#5            1  Allen:10155                                Br_brain
+#6            1  Allen:10157            FGM_gray matter of forebrain
+#  n_significant mean_FWER min_FWER               equivalent_structures
+#1             0 0.8966667     0.07             Allen:10333;Allen:10332
+#2             0 0.9288889     0.36             Allen:10333;Allen:10332
+#3             0 0.9344444     0.41 Allen:10294;Allen:10293;Allen:10292
+#4             0 0.9466667     0.52                         Allen:10173
+#5             0 1.0000000     1.00 Allen:10155;Allen:10154;Allen:10153
+#6             0 1.0000000     1.00             Allen:10157;Allen:10156
 # ha - not significant any more
 # TODO: maybe recompute allele freqs and not use the big merged file
 
@@ -223,6 +237,12 @@ Rscript /mnt/expressions/steffi/D/scripts/catalog_chagyrskaya4.R
 # orginal flipped: fixed derived in Africans, ancestral in Nean+Den
 cd /mnt/scratch/steffi/D/Chagyrskaya/catalog_archaic_derived_02
 Rscript /mnt/expressions/steffi/D/scripts/catalog_chagyrskaya5.R
+
+# 11.10.20 require g1000 AFR2 <= 0.03 derived freq instead of fixed ancestral in SGDP Africa2
+# orginal flipped: fixed derived in Africans, ancestral in Nean+Den
+cd /mnt/scratch/steffi/D/Chagyrskaya/catalog_archaic_derived_06
+nohup Rscript /mnt/expressions/steffi/D/scripts/catalog_chagyrskaya6.R &
+
 
 ## see .Rmd files in ~/ownCloud/Chagyrskaya for complete processing
 # re-ran so far:
