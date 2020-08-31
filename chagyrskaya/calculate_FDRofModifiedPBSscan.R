@@ -74,7 +74,7 @@ if (!is.numeric(res[1,1])){
 for (icol in 2:ncol(res)){ res[,icol]<-as.numeric(as.character(res[,icol])) }
 for (icol in 2:ncol(res_tot)){ res_tot[,icol]<-as.numeric(as.character(res_tot[,icol])) }
 }
-for ( myPBS in c("PBS_weirn_A","PBS_weirn_N","PBS_weirn_D","PBS_reichin_N","PBS_reichn_N","PBS_reichin_A","PBS_reichin_D","PBS_reichn_A","PBS_reichn_D"))
+for ( myPBS in c("PBS_reichin_N"))#,"PBS_weirn_A","PBS_weirn_N","PBS_weirn_D","PBS_reichin_N","PBS_reichn_N","PBS_reichin_A","PBS_reichin_D","PBS_reichn_A","PBS_reichn_D"))
 {
 res<-res_backup
 res<-res[!is.na(res[[myPBS]]),]
@@ -102,18 +102,22 @@ library(RColorBrewer)
 mycols=rep(brewer.pal(n = 8, name = "Dark2"),3)
 res<-res[with(res, order(res$CHROM,res$BIN_START)), ] 
 res$start_resc<-1:nrow(res)
-png(paste0(myPBS,"_win",winsize,"_fdr.png"),width = 465, height = 225, units='mm', res = 300)
+png(paste0(myPBS,"_win",winsize,"_fdr.png"),width = 465, height = 225, units='mm', res = 1600)
 plot(res$start_resc,-log(res$fdr+0.000001,10),pch=19,col=mycols[res$CHROM],ylim=c(0,6.1),ylab="-log(FDR,10)",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
+axis(side = 1, lwd = 2)
+axis(side = 2, lwd = 2)
+box(lwd=2)
 abline(h=-log(0.05+0.000001,10))
 dev.off()
 
-png(paste0(myPBS,"_win",winsize,"_pvalue.png"),width = 465, height = 225, units='mm', res = 300)
+pdf(paste0(myPBS,"_win",winsize,"_pvalue.pdf"))#,width = 465, height = 225, units='mm', res = 300)
 plot(res$start_resc,-log(res$pvalue+0.000001,10),pch=19,col=mycols[res$CHROM],ylim=c(0,6.1),ylab="-log(p.value,10)",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
 #abline(h=-log(0.05+0.000001,10))
 dev.off()
 
 res[[myPBS]][res[[myPBS]]>20]<-20
-png(paste0(myPBS,"_win",winsize,".png"),width = 465, height = 225, units='mm', res = 300)
+#png(paste0(myPBS,"_win",winsize,".png"),width = 465, height = 225, units='mm', res = 300)
+pdf(paste0(myPBS,"_win",winsize,".pdf"))
 plot(res$start_resc,res[[myPBS]],pch=19,col=mycols[res$CHROM],ylim=c(0,max(res[[myPBS]])+0.1),ylab="PBS",xlab=paste0("pos window ",winsize,"bp"),xaxt='n')
 dev.off()
 
